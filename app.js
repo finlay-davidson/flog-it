@@ -1,7 +1,15 @@
 import express from "express";
+import cors from "cors";
 import listingsRouter from "./routes/listings.js";
 
 const app = express();
+app.use(cors({
+    origin: [
+        "http://localhost:5173",
+        "https://flogit.com.au"
+    ],
+    credentials: true
+}));
 app.use(express.json());
 
 app.use("/listings", listingsRouter);

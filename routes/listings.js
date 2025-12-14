@@ -7,13 +7,38 @@ const router = express.Router();
 
 // Public: get all active listings
 router.get("/", async (req, res) => {
-    const { data, error } = await supabase
-        .from("listings")
-        .select("*")
-        .eq("is_active", true)
+
+    const { q, minPrice, maxPrice } = req.query;
+
+    let query = supabase
+        .from('listings')
+        .select(`
+            *,
+            profile:user_id (
+                display_name
+            )
+        `)
+        .eq('is_active', true);
+
+    if (q) {
+        query = query.ilike("title", `%${q}%`);
+    }
+
+    if (minPrice) {
+        query = query.gte("price", Number(minPrice));
+    }
+
+    if (maxPrice) {
+        query = query.lte("price", Number(maxPrice));
+    }
+
+    const { data, error } = await query
         .order("created_at", { ascending: false });
 
-    if (error) return res.status(400).json({ error: error.message });
+    if (error) {
+        return res.status(500).json({ error: "Failed to load listings" });
+    }
+
     res.json(data);
 });
 

@@ -1,20 +1,23 @@
 {
-  "name": "express-hello-world",
+  "name": "flogit-server",
   "version": "1.0.0",
-  "description": "Express Hello World on Render",
+  "description": "flog it! server api",
   "main": "app.js",
   "repository": "https://github.com/render-examples/express-hello-world",
   "author": "Render Developers",
   "license": "MIT",
   "private": false,
   "scripts": {
+    "dev": "vite",
     "start": "node app.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.87.1",
     "express": "^5.0.0",
     "supabase": "^2.67.0"
   },
   "devDependencies": {
-    "@flydotio/dockerfile": "^0.7.10"
+    "@flydotio/dockerfile": "^0.7.10",
+    "vite": "^7.2.7"
   }
 }

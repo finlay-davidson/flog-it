@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     const { data, error } = await supabase
         .from("listings")
-        .select("*")
+        .select("*, profile:user_id (*)")
         .eq("id", req.params.id)
         .eq("is_active", true)
         .single();

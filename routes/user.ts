@@ -27,3 +27,6 @@ router.get("/listings", authenticate, async (req, res) => {
 
     res.json(listings);
 });
+
+
+export default router;

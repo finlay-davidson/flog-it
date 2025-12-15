@@ -12,6 +12,6 @@
 
         "skipLibCheck": true
     },
-    "include": ["src", "src/types"],
+    "include": ["types", "utils", "helpers", "middleware", "routes"],
     "exclude": ["node_modules"]
 }

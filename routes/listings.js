@@ -5,11 +5,13 @@ import { supabase } from "../utils/supabaseClient.js";
 import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
+router.use(express.json()); // only applies to this router
+
 const storage = multer.memoryStorage();
 const upload = multer({ 
     storage,
     limits: {
-        fileSize: 1 * 1024 * 1024 // 1MB hard limit
+        fileSize: 1_000_000  // 1MB hard limit
     }
 });
 
@@ -135,7 +137,7 @@ router.post(
             const { error } = await supabase.storage
                 .from("listings")
                 .upload(path, file.buffer, {
-                contentType: file.mimetype
+                    contentType: file.mimetype
                 });
 
             if (error) {

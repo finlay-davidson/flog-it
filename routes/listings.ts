@@ -63,7 +63,11 @@ router.get("/", express.json(), async (req, res) => {
 router.get("/:id", express.json(), async (req, res) => {
     const { data: listing, error } = await supabase
         .from("listings")
-        .select("*, profile:user_id (*)")
+        .select(`
+            *, 
+            profile:user_id (*),
+            category:category_id (name)
+        `)
         .eq("id", req.params.id)
         .eq("is_active", true)
         .single();
@@ -83,10 +87,11 @@ router.post("/", express.json(), authenticate, async (req, res) => {
         description,
         price,
         category_id,
-        locality_name,
-        locality_id,
         region_code,
+        place_id,
         place_name,
+        locality_id,
+        locality_name,
         location_lat,
         location_lng
     } = req.body;
@@ -99,10 +104,11 @@ router.post("/", express.json(), authenticate, async (req, res) => {
             price,
             category_id,
             user_id: user.id,
-            locality_name,
-            locality_id,
             region_code,
+            place_id,
             place_name,
+            locality_id,
+            locality_name,
             location_lat,
             location_lng,
             is_active: true
@@ -143,10 +149,11 @@ router.put("/:id", express.json(), authenticate, async (req, res) => {
     const user = req.user;
     const { id } = req.params;
     const { title, description, price, category_id, 
+        region_code,
+        place_id,
+        place_name,
         locality_name,
         locality_id,
-        region_code,
-        place_name,
         location_lat,
         location_lng } = req.body;
     
@@ -156,11 +163,12 @@ router.put("/:id", express.json(), authenticate, async (req, res) => {
         title,
         description,
         price: Number(price),
-        category_id: category_id,
+        category_id,
+        region_code,
+        place_id,
+        place_name,
         locality_name,
         locality_id,
-        region_code,
-        place_name,
         location_lat,
         location_lng,
     }).eq("id", id);

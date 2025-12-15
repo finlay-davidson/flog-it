@@ -4,7 +4,7 @@ import { supabase } from "../utils/supabase.ts";
 export async function requireListingOwner(listingId: string, userId: string) {
     const { data: listing, error } = await supabase
         .from("listings")
-        .select("user_id")
+        .select("*")
         .eq("id", listingId)
         .single();
 

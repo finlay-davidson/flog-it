@@ -126,12 +126,6 @@ router.post("/", express.json(), authenticate, async (req, res) => {
     res.json(data[0]);
 });
 
-// Authenticated: upload listing images (owner only)
-router.put("/:id/images", express.json(), authenticate, async (req, res) => {
-
-});
-
-
 router.post(
     "/:id/images",
     authenticate,
@@ -161,21 +155,54 @@ router.post(
 router.put("/:id", express.json(), authenticate, async (req, res) => {
     const user = req.user;
     const { id } = req.params;
-    const { title, description, price, category, location, images } = req.body;
-
+    const { title, description, price, category_id, 
+        locality_name,
+        locality_id,
+        region_code,
+        place_name,
+        location_lat,
+        location_lng } = req.body;
+    
     await requireListingOwner(id, user!.id);
 
-    const { data, error } = await supabase
-        .from("listings")
-        .update({ title, description, price, category, location, images })
-        .eq("id", req.params.id)
-        .select();
+     await supabase.from("listings").update({
+        title,
+        description,
+        price: Number(price),
+        category_id: category_id,
+        locality_name,
+        locality_id,
+        region_code,
+        place_name,
+        location_lat,
+        location_lng,
+    }).eq("id", id);
 
-    if (error) return res.status(400).json({ error: error.message });
-    res.json(data[0]);
+    res.json({ success: true, message: 'Listing updated' });
 });
 
+// Authenticated: update listing images (owner only)
+router.put("/:id/images", express.json(), authenticate, async (req, res) => {
+    const user = req.user;
+    const { id } = req.params;
 
+    const listing = await requireListingOwner(id, user!.id);
+
+    const { imageUrls, thumbnailUrls } = await uploadListingImages(
+        id,
+        req.files as Express.Multer.File[],
+        listing.images || [],
+        listing.thumbnails || []
+    );
+
+    // 3. Save image URLs
+    await supabase
+        .from("listings")
+        .update({ image_count: imageUrls.length ?? 0 })
+        .eq("id", id);
+        
+    res.json({ success: true });
+});
 
 // Authenticated: delete listing (soft delete)
 router.delete("/:id", express.json(), authenticate, async (req, res) => {

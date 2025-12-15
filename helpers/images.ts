@@ -43,7 +43,7 @@ export async function uploadListingImages(
 
         const { error: uploadError } = await supabase.storage
             .from("listings")
-            .upload(fullPath, imgBuffer, { contentType: file.mimetype, upsert: true });
+            .upload(fullPath, imgBuffer, { contentType: 'image/webp', upsert: true });
 
         if (uploadError) throw new Error(`Full image upload failed for index ${i}`);
 
@@ -59,7 +59,7 @@ export async function uploadListingImages(
         const thumbPath = `${listingId}/${i}-thumb.webp`;
         const { error: thumbError } = await supabase.storage
             .from("listings")
-            .upload(thumbPath, thumbBuffer, { contentType: file.mimetype, upsert: true });
+            .upload(thumbPath, thumbBuffer, { contentType: 'image/webp', upsert: true });
 
         if (thumbError) throw new Error(`Thumbnail upload failed for index ${i}`);
 

@@ -101,10 +101,6 @@ router.post(
     async (req, res) => {
         const user = req.user;
         const { id } = req.params;
-        console.log("Headers:", req.headers["content-type"]);
-        console.log("Files received:", req.files);
-        console.log("Body fields:", req.body);
-        return res.json({ ok: true });
 
         // 1. Verify ownership
         const { data: listing } = await supabase

@@ -1,5 +1,5 @@
 // helpers/images.ts
-import { supabase } from "../utils/supabase.js";
+import { supabase } from "../utils/supabase.ts";
 
 type UploadedFile = Express.Multer.File;
 

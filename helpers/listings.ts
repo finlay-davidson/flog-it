@@ -1,5 +1,5 @@
 // helpers/listings.ts
-import { supabase } from "../utils/supabase.js";
+import { supabase } from "../utils/supabase.ts";
 
 export async function requireListingOwner(listingId: string, userId: string) {
     const { data: listing, error } = await supabase

@@ -2,9 +2,9 @@ import express from "express";
 
 import multer from "multer";
 import { supabase } from "../utils/supabase.ts";
-import { authenticate } from "../middleware/auth.js";
-import { requireListingOwner } from "../helpers/listings.js";
-import { uploadListingImages } from "../helpers/images.js";
+import { authenticate } from "../middleware/auth.ts";
+import { requireListingOwner } from "../helpers/listings.ts";
+import { uploadListingImages } from "../helpers/images.ts";
 
 const router = express.Router();
 const storage = multer.memoryStorage();

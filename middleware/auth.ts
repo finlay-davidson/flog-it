@@ -1,5 +1,5 @@
 // middleware/auth.js
-import { supabase } from "../utils/supabase.js";
+import { supabase } from "../utils/supabase.ts";
 import type {
     Request,
     Response,

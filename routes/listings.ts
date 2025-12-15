@@ -58,7 +58,7 @@ router.get("/", express.json(), async (req, res) => {
             const thumbUrl = `${bucketUrl}/${listings[i].id}/${j}-thumb.jpeg`;
             thumbs.push(thumbUrl);
         }
-        listings[i].thumbnails = thumbs;
+        listings[i].thumbs = thumbs;
     }
 
     res.json(listings);

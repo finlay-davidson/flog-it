@@ -3,7 +3,7 @@ import express from "express";
 import multer, { MulterError} from "multer";
 import { supabase } from "../utils/supabase.ts";
 import { authenticate } from "../middleware/auth.ts";
-import { requireListingOwner } from "../helpers/listings.ts";
+import { requireListingOwner, generateThumbPaths, generateImagePaths } from "../helpers/listings.ts";
 import { uploadListingImages } from "../helpers/images.ts";
 
 const bucketUrl = "https://pvfwwwovnyylktrsfqkn.supabase.co/storage/v1/object/public/listings";
@@ -52,13 +52,8 @@ router.get("/", express.json(), async (req, res) => {
 
     for (let i = 0; i < listings.length; i++) {
         const maxImages = listings[i].image_count;
-        const thumbs: string[] = [];
-
-        for (let j = 0; j < maxImages; j++) {
-            const thumbUrl = `${bucketUrl}/${listings[i].id}/${j}-thumb.webp`;
-            thumbs.push(thumbUrl);
-        }
-        listings[i].thumbs = thumbs;
+ 
+        listings[i].thumbs = generateThumbPaths(listings[i].id, maxImages);
     }
 
     res.json(listings);
@@ -75,15 +70,7 @@ router.get("/:id", express.json(), async (req, res) => {
 
     if (error) return res.status(404).json({ error: "Listing not found" });
 
-    const maxImages = listing.image_count;
-    const images: string[] = [];
-
-    for (let i = 0; i < maxImages; i++) {
-        const fullUrl = `${bucketUrl}/${listing.id}/${i}.webp`;
-        images.push(fullUrl);
-    }
-
-    listing.images = images;
+    listing.images = generateImagePaths(listing.id, listing.image_count);
 
     res.json(listing);
 });
@@ -191,8 +178,8 @@ router.put("/:id/images", authenticate, upload.array("images", 10), async (req, 
     const { imageUrls, thumbnailUrls } = await uploadListingImages(
         id,
         req.files as Express.Multer.File[],
-        listing.images || [],
-        listing.thumbnails || []
+        generateImagePaths(id, listing.image_count),
+        generateThumbPaths(id, listing.image_count)
     );
 
     // 3. Save image URLs

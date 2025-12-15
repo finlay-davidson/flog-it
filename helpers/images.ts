@@ -38,13 +38,14 @@ export async function uploadListingImages(
 
         if (file.size > 1_000_000) throw new Error("Image exceeds 1MB limit");
 
-        const ext = file.mimetype.split("/")[1];
+        const fullPath = `${listingId}/${i}.webp`;
+        const imgBuffer = await sharp(file.buffer)
+            .webp({ quality: 80 })
+            .toBuffer();
 
-        // Full image path: {listingId}/0.jpg, 1.jpg, etc
-        const fullPath = `${listingId}/${i}.${ext}`;
         const { error: uploadError } = await supabase.storage
             .from("listings")
-            .upload(fullPath, file.buffer, { contentType: file.mimetype, upsert: true });
+            .upload(fullPath, imgBuffer, { contentType: file.mimetype, upsert: true });
 
         if (uploadError) throw new Error(`Full image upload failed for index ${i}`);
 
@@ -54,9 +55,10 @@ export async function uploadListingImages(
         // --- Thumbnail ---
         const thumbBuffer = await sharp(file.buffer)
             .resize(300, 300, { fit: "cover", position: "center" })
+            .webp({ quality: 80 })
             .toBuffer();
 
-        const thumbPath = `${listingId}/${i}-thumb.${ext}`;
+        const thumbPath = `${listingId}/${i}-thumb.webp`;
         const { error: thumbError } = await supabase.storage
             .from("listings")
             .upload(thumbPath, thumbBuffer, { contentType: file.mimetype, upsert: true });

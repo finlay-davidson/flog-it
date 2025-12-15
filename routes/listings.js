@@ -63,6 +63,7 @@ router.get("/:id", async (req, res) => {
 
 // Authenticated: create listing
 router.post("/", authenticate, async (req, res) => {
+    const user = req.user;
     const {
         title,
         description,

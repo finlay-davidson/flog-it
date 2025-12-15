@@ -6,6 +6,7 @@ import { authenticate } from "../middleware/auth.ts";
 import { requireListingOwner } from "../helpers/listings.ts";
 import { uploadListingImages } from "../helpers/images.ts";
 
+const bucketUrl = "https://pvfwwwovnyylktrsfqkn.supabase.co/storage/v1/object/public/listings";
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ 
@@ -42,19 +43,30 @@ router.get("/", express.json(), async (req, res) => {
         query = query.lte("price", Number(maxPrice));
     }
 
-    const { data, error } = await query
+    const { data: listings, error } = await query
         .order("created_at", { ascending: false });
 
     if (error) {
         return res.status(500).json({ error: "Failed to load listings" });
     }
 
-    res.json(data);
+    for (const listing of listings) {
+        const maxImages = listing.image_count;
+        const thumbs: string[] = [];
+
+        for (let i = 0; i < maxImages; i++) {
+            const thumbUrl = `${bucketUrl}/${listing.id}/${i}-thumb.jpeg`;
+            thumbs.push(thumbUrl);
+        }
+        listing.thumbnails = thumbs;
+    }
+
+    res.json(listings);
 });
 
 // Public: get single listing
 router.get("/:id", express.json(), async (req, res) => {
-    const { data, error } = await supabase
+    const { data: listing, error } = await supabase
         .from("listings")
         .select("*, profile:user_id (*)")
         .eq("id", req.params.id)
@@ -62,7 +74,18 @@ router.get("/:id", express.json(), async (req, res) => {
         .single();
 
     if (error) return res.status(404).json({ error: "Listing not found" });
-    res.json(data);
+
+    const maxImages = listing.image_count;
+    const images: string[] = [];
+
+    for (let i = 0; i < maxImages; i++) {
+        const fullUrl = `${bucketUrl}/${listing.id}/${i}.jpeg`;
+        images.push(fullUrl);
+    }
+
+    listing.images = images;
+
+    res.json(listing);
 });
 
 // Authenticated: create listing
@@ -119,7 +142,7 @@ router.post(
         
         await requireListingOwner(id, user!.id);
 
-        const imageUrls = await uploadListingImages(
+        const { imageUrls } = await uploadListingImages(
             id,
             req.files as Express.Multer.File[]
         );
@@ -127,7 +150,7 @@ router.post(
         // 3. Save image URLs
         await supabase
             .from("listings")
-            .update({ images: imageUrls })
+            .update({ image_count: imageUrls.length ?? 0 })
             .eq("id", id);
 
         res.json({ success: true });

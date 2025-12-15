@@ -36,8 +36,6 @@ export async function uploadListingImages(
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
 
-        if (file.size > 1_000_000) throw new Error("Image exceeds 1MB limit");
-
         const fullPath = `${listingId}/${i}.webp`;
         const imgBuffer = await sharp(file.buffer)
             .webp({ quality: 80 })

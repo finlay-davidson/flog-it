@@ -55,7 +55,7 @@ router.get("/", express.json(), async (req, res) => {
         const thumbs: string[] = [];
 
         for (let j = 0; j < maxImages; j++) {
-            const thumbUrl = `${bucketUrl}/${listings[i].id}/${j}-thumb.jpeg`;
+            const thumbUrl = `${bucketUrl}/${listings[i].id}/${j}-thumb.webp`;
             thumbs.push(thumbUrl);
         }
         listings[i].thumbs = thumbs;
@@ -79,7 +79,7 @@ router.get("/:id", express.json(), async (req, res) => {
     const images: string[] = [];
 
     for (let i = 0; i < maxImages; i++) {
-        const fullUrl = `${bucketUrl}/${listing.id}/${i}.jpeg`;
+        const fullUrl = `${bucketUrl}/${listing.id}/${i}.webp`;
         images.push(fullUrl);
     }
 

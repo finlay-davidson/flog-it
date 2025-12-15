@@ -1,6 +1,6 @@
 import express from "express";
 
-import multer from "multer";
+import multer, { MulterError} from "multer";
 import { supabase } from "../utils/supabase.ts";
 import { authenticate } from "../middleware/auth.ts";
 import { requireListingOwner } from "../helpers/listings.ts";
@@ -223,6 +223,22 @@ router.delete("/:id", express.json(), authenticate, async (req, res) => {
 
     if (error) return res.status(400).json({ error: error.message });
     res.json({ message: "Listing deleted" });
+});
+
+router.use((err: any, req: any, res: any, next: any) => {
+    if (err instanceof MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({
+                error: "Image must be smaller than 1MB"
+            });
+        }
+    }
+
+    if (err instanceof Error) {
+        return res.status(400).json({ error: err.message });
+    }
+
+    next(err);
 });
 
 export default router;

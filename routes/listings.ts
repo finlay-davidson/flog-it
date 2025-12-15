@@ -6,7 +6,6 @@ import { authenticate } from "../middleware/auth.ts";
 import { requireListingOwner, generateThumbPaths, generateImagePaths } from "../helpers/listings.ts";
 import { uploadListingImages } from "../helpers/images.ts";
 
-const bucketUrl = "https://pvfwwwovnyylktrsfqkn.supabase.co/storage/v1/object/public/listings";
 const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ 
@@ -77,6 +76,30 @@ router.get("/:id", express.json(), async (req, res) => {
     listing.images = generateImagePaths(listing.id, listing.image_count);
 
     res.json(listing);
+});
+
+
+// Authenticated: get a users listings
+router.get("/user", express.json(), authenticate, async (req, res) => {
+    const user = (req as any).user;
+    const { data: listings, error } = await supabase
+        .from("listings")
+        .select(`
+            *
+        `)
+        .eq("user_id", user.id);
+
+    if (error) {
+        return res.status(500).json({ error: "Failed to load listings" });
+    }
+
+    for (let i = 0; i < listings.length; i++) {
+        const maxImages = listings[i].image_count;
+ 
+        listings[i].thumbs = generateThumbPaths(listings[i].id, maxImages);
+    }
+
+    res.json(listings);
 });
 
 // Authenticated: create listing

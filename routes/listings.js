@@ -1,11 +1,9 @@
-// routes/listings.js
 import express from "express";
 import multer from "multer";
 import { supabase } from "../utils/supabaseClient.js";
 import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
-
 const storage = multer.memoryStorage();
 const upload = multer({ 
     storage,
@@ -103,7 +101,7 @@ router.post(
     async (req, res) => {
         const user = req.user;
         const { id } = req.params;
-
+        console.log("Headers:", req.headers["content-type"]);
         console.log("Files received:", req.files);
         console.log("Body fields:", req.body);
         return res.json({ ok: true });

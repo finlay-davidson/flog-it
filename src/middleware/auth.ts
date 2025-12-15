@@ -1,7 +1,16 @@
 // middleware/auth.js
-import { supabase } from "../utils/supabaseClient.js";
+import { supabase } from "../utils/supabase.js";
+import type {
+    Request,
+    Response,
+    NextFunction
+} from "express";
 
-export async function authenticate(req, res, next) {
+export async function authenticate(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     const authHeader = req.headers.authorization;
     if (!authHeader) return res.status(401).json({ error: "Missing auth header" });
 
@@ -9,6 +18,6 @@ export async function authenticate(req, res, next) {
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) return res.status(401).json({ error: "Invalid token" });
-    req.user = user;
+    (req as any).user = user;
     next();
 }

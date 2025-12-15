@@ -1,7 +1,10 @@
 import express from "express";
+
 import multer from "multer";
-import { supabase } from "../utils/supabaseClient.js";
+import { supabase } from "../utils/supabase.js";
 import { authenticate } from "../middleware/auth.js";
+import { requireListingOwner } from "../helpers/listings.js";
+import { uploadListingImages } from "../helpers/images.js";
 
 const router = express.Router();
 const storage = multer.memoryStorage();
@@ -64,7 +67,7 @@ router.get("/:id", express.json(), async (req, res) => {
 
 // Authenticated: create listing
 router.post("/", express.json(), authenticate, async (req, res) => {
-    const user = req.user;
+    const user = (req as any).user;
     const {
         title,
         description,
@@ -93,7 +96,11 @@ router.post("/", express.json(), authenticate, async (req, res) => {
     if (error) return res.status(400).json({ error: error.message });
     res.json(data[0]);
 });
+router.put("/:id/images", express.json(), authenticate, async (req, res) => {
 
+
+
+});
 router.post(
     "/:id/images",
     authenticate,
@@ -101,52 +108,14 @@ router.post(
     async (req, res) => {
         const user = req.user;
         const { id } = req.params;
+        
+        await requireListingOwner(id, user.id);
 
-        // 1. Verify ownership
-        const { data: listing } = await supabase
-            .from("listings")
-            .select("user_id")
-            .eq("id", id)
-            .single();
 
-        if (!listing || listing.user_id !== user.id) {
-            return res.status(403).json({ error: "Forbidden" });
-        }
-
-        // 2. Validate files
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: "No images uploaded" });
-        }
-
-        const imageUrls = [];
-
-        for (let i = 0; i < req.files.length; i++) {
-            const file = req.files[i];
-
-            // Double check size (defensive)
-            if (file.size > 1_000_000) {
-                return res.status(400).json({ error: "Image exceeds 1MB limit" });
-            }
-
-            const ext = file.mimetype.split("/")[1];
-            const path = `${id}/${Date.now()}-${i}.${ext}`;
-
-            const { error } = await supabase.storage
-                .from("listings")
-                .upload(path, file.buffer, {
-                    contentType: file.mimetype
-                });
-
-            if (error) {
-                return res.status(500).json({ error: "Image upload failed" });
-            }
-
-            const { data } = supabase.storage
-                .from("listings")
-                .getPublicUrl(path);
-
-            imageUrls.push(data.publicUrl);
-        }
+        const imageUrls = await uploadListingImages(
+            id,
+            req.files as Express.Multer.File[]
+        );
 
         // 3. Save image URLs
         await supabase

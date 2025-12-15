@@ -136,17 +136,11 @@ router.post(
 
 // Authenticated: update listing (owner only)
 router.put("/:id", express.json(), authenticate, async (req, res) => {
+    const user = req.user;
+    const { id } = req.params;
     const { title, description, price, category, location, images } = req.body;
 
-    // check ownership
-    const { data: listing, error: fetchError } = await supabase
-        .from("listings")
-        .select("*")
-        .eq("id", req.params.id)
-        .single();
-
-    if (fetchError || !listing) return res.status(404).json({ error: "Listing not found" });
-    if (listing.owner_id !== req.user!.id) return res.status(403).json({ error: "Forbidden" });
+    await requireListingOwner(id, user!.id);
 
     const { data, error } = await supabase
         .from("listings")

@@ -16,6 +16,7 @@
     "cors": "^2.8.5",
     "express": "^5.0.0",
     "multer": "^2.0.2",
+    "sharp": "^0.34.5",
     "supabase": "^2.67.0"
   },
   "devDependencies": {

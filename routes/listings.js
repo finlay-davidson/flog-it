@@ -5,7 +5,6 @@ import { supabase } from "../utils/supabaseClient.js";
 import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
-router.use(express.json()); // only applies to this router
 
 const storage = multer.memoryStorage();
 const upload = multer({ 
@@ -16,7 +15,7 @@ const upload = multer({
 });
 
 // Public: get all active listings
-router.get("/", async (req, res) => {
+router.get("/", express.json(), async (req, res) => {
 
     const { q, minPrice, maxPrice } = req.query;
 
@@ -53,7 +52,7 @@ router.get("/", async (req, res) => {
 });
 
 // Public: get single listing
-router.get("/:id", async (req, res) => {
+router.get("/:id", express.json(), async (req, res) => {
     const { data, error } = await supabase
         .from("listings")
         .select("*, profile:user_id (*)")
@@ -66,7 +65,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Authenticated: create listing
-router.post("/", authenticate, async (req, res) => {
+router.post("/", express.json(), authenticate, async (req, res) => {
     const user = req.user;
     const {
         title,
@@ -162,7 +161,7 @@ router.post(
 );
 
 // Authenticated: update listing (owner only)
-router.put("/:id", authenticate, async (req, res) => {
+router.put("/:id", express.json(), authenticate, async (req, res) => {
     const { title, description, price, category, location, images } = req.body;
 
     // check ownership
@@ -188,7 +187,7 @@ router.put("/:id", authenticate, async (req, res) => {
 
 
 // Authenticated: delete listing (soft delete)
-router.delete("/:id", authenticate, async (req, res) => {
+router.delete("/:id", express.json(), authenticate, async (req, res) => {
     const { data: listing, error: fetchError } = await supabase
         .from("listings")
         .select("*")

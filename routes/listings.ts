@@ -96,11 +96,13 @@ router.post("/", express.json(), authenticate, async (req, res) => {
     if (error) return res.status(400).json({ error: error.message });
     res.json(data[0]);
 });
+
+// Authenticated: upload listing images (owner only)
 router.put("/:id/images", express.json(), authenticate, async (req, res) => {
 
-
-
 });
+
+
 router.post(
     "/:id/images",
     authenticate,
@@ -111,11 +113,12 @@ router.post(
         
         await requireListingOwner(id, user!.id);
 
-
         const imageUrls = await uploadListingImages(
             id,
             req.files as Express.Multer.File[]
         );
+
+        console.log("Uploaded image URLs:", imageUrls);
 
         // 3. Save image URLs
         await supabase

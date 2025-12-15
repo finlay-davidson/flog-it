@@ -109,7 +109,7 @@ router.post(
         const user = req.user;
         const { id } = req.params;
         
-        await requireListingOwner(id, user.id);
+        await requireListingOwner(id, user!.id);
 
 
         const imageUrls = await uploadListingImages(
@@ -139,7 +139,7 @@ router.put("/:id", express.json(), authenticate, async (req, res) => {
         .single();
 
     if (fetchError || !listing) return res.status(404).json({ error: "Listing not found" });
-    if (listing.owner_id !== req.user.id) return res.status(403).json({ error: "Forbidden" });
+    if (listing.owner_id !== req.user!.id) return res.status(403).json({ error: "Forbidden" });
 
     const { data, error } = await supabase
         .from("listings")
@@ -162,7 +162,7 @@ router.delete("/:id", express.json(), authenticate, async (req, res) => {
         .single();
 
     if (fetchError || !listing) return res.status(404).json({ error: "Listing not found" });
-    if (listing.owner_id !== req.user.id) return res.status(403).json({ error: "Forbidden" });
+    if (listing.owner_id !== req.user!.id) return res.status(403).json({ error: "Forbidden" });
 
     const { data, error } = await supabase
         .from("listings")

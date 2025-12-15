@@ -5,7 +5,9 @@ import { supabase } from "../utils/supabaseClient.js";
 import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
-const upload = multer({
+const storage = multer.memoryStorage();
+const upload = multer({ 
+    storage,
     limits: {
         fileSize: 1 * 1024 * 1024 // 1MB hard limit
     }

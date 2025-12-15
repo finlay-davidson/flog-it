@@ -78,30 +78,6 @@ router.get("/:id", express.json(), async (req, res) => {
     res.json(listing);
 });
 
-
-// Authenticated: get a users listings
-router.get("/user", express.json(), authenticate, async (req, res) => {
-    const user = (req as any).user;
-    const { data: listings, error } = await supabase
-        .from("listings")
-        .select(`
-            *
-        `)
-        .eq("user_id", user.id);
-
-    if (error) {
-        return res.status(500).json({ error: "Failed to load listings" });
-    }
-
-    for (let i = 0; i < listings.length; i++) {
-        const maxImages = listings[i].image_count;
- 
-        listings[i].thumbs = generateThumbPaths(listings[i].id, maxImages);
-    }
-
-    res.json(listings);
-});
-
 // Authenticated: create listing
 router.post("/", express.json(), authenticate, async (req, res) => {
     const user = (req as any).user;

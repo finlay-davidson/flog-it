@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import listingsRouter from "./routes/listings.ts";
+import userRouter from "./routes/user.ts";
 
 const app = express();
 app.use(cors({
@@ -12,6 +13,7 @@ app.use(cors({
 }));
 
 app.use("/listings", listingsRouter);
+app.use("/user", userRouter);
 
 app.get("/", (req, res) => res.send("Marketplace API running"));
 

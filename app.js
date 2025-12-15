@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import listingsRouter from "./src/routes/listings.ts";
+import listingsRouter from "./routes/listings.ts";
 
 const app = express();
 app.use(cors({

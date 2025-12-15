@@ -73,7 +73,10 @@ router.post("/", express.json(), authenticate, async (req, res) => {
         description,
         price,
         category_id,
-        location_text,
+        locality_name,
+        locality_id,
+        region_code,
+        place_name,
         location_lat,
         location_lng
     } = req.body;
@@ -86,7 +89,10 @@ router.post("/", express.json(), authenticate, async (req, res) => {
             price,
             category_id,
             user_id: user.id,
-            location_text,
+            locality_name,
+            locality_id,
+            region_code,
+            place_name,
             location_lat,
             location_lng,
             is_active: true
@@ -117,8 +123,6 @@ router.post(
             id,
             req.files as Express.Multer.File[]
         );
-
-        console.log("Uploaded image URLs:", imageUrls);
 
         // 3. Save image URLs
         await supabase

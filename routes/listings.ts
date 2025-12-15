@@ -1,7 +1,7 @@
 import express from "express";
 
 import multer from "multer";
-import { supabase } from "../utils/supabase.js";
+import { supabase } from "../utils/supabase.ts";
 import { authenticate } from "../middleware/auth.js";
 import { requireListingOwner } from "../helpers/listings.js";
 import { uploadListingImages } from "../helpers/images.js";

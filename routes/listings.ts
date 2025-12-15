@@ -50,15 +50,15 @@ router.get("/", express.json(), async (req, res) => {
         return res.status(500).json({ error: "Failed to load listings" });
     }
 
-    for (const listing of listings) {
-        const maxImages = listing.image_count;
+    for (let i = 0; i < listings.length; i++) {
+        const maxImages = listings[i].image_count;
         const thumbs: string[] = [];
 
-        for (let i = 0; i < maxImages; i++) {
-            const thumbUrl = `${bucketUrl}/${listing.id}/${i}-thumb.jpeg`;
+        for (let j = 0; j < maxImages; j++) {
+            const thumbUrl = `${bucketUrl}/${listings[i].id}/${j}-thumb.jpeg`;
             thumbs.push(thumbUrl);
         }
-        listing.thumbnails = thumbs;
+        listings[i].thumbnails = thumbs;
     }
 
     res.json(listings);

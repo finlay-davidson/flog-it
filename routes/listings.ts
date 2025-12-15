@@ -12,7 +12,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ 
     storage,
     limits: {
-        fileSize: 1_100_000  // 1MB hard limit
+        fileSize: 1_200_000  // 1MB hard limit
     }
 });
 
@@ -182,7 +182,7 @@ router.put("/:id", express.json(), authenticate, async (req, res) => {
 });
 
 // Authenticated: update listing images (owner only)
-router.put("/:id/images", upload.array("images", 10), authenticate, async (req, res) => {
+router.put("/:id/images", authenticate, upload.array("images", 10), async (req, res) => {
     const user = req.user;
     const { id } = req.params;
 
